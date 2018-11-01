@@ -5,6 +5,7 @@ import org.junit.Test;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class RoutesTest {
@@ -42,7 +43,33 @@ public class RoutesTest {
 
     @Test
     public void testMatchRoutes() {
+        Routes<Integer> intRoutes = new Routes<>();
 
+        intRoutes.addRoute(new Route<>("/", 1, 1));
+        intRoutes.addRoute(new Route<>("/plus", 2, 2));
+        intRoutes.addRoute(new Route<>("/minus", 3, 3));
+        intRoutes.addRoute(new Route<>("/minus/1", 4, 4));
+        intRoutes.addRoute(new Route<>("/minus/:value", 5, 5));
+        intRoutes.addRoute(new Route<>("/minus/*foo", 6, 6));
+
+        assertEquals(1, intRoutes.matchRoute("/").get().getPayload().intValue());
+        assertEquals(2, intRoutes.matchRoute("/plus").get().getPayload().intValue());
+        assertEquals(2, intRoutes.matchRoute("/plus/").get().getPayload().intValue());
+        assertEquals(3, intRoutes.matchRoute("/minus").get().getPayload().intValue());
+        assertEquals(4, intRoutes.matchRoute("/minus/1").get().getPayload().intValue());
+        assertEquals(5, intRoutes.matchRoute("/minus/2").get().getPayload().intValue());
+        assertEquals(6, intRoutes.matchRoute("/minus/2/3").get().getPayload().intValue());
+
+        assertEquals(3, intRoutes.matchRoutes("/minus/1").size());
+        assertEquals(0, intRoutes.matchRoutes("/multi/1").size());
     }
 
+    @Test
+    public void testEmptyNode() {
+        Routes<Integer> intRoutes = new Routes<>();
+        intRoutes.addRoute(new Route<>("/minus/:value", 1, 1));
+
+        assertEquals(0, intRoutes.matchRoutes("/minus").size());
+        assertFalse(intRoutes.matchRoute("/minus").isPresent());
+    }
 }

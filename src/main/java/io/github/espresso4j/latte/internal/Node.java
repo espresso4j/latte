@@ -27,7 +27,7 @@ public class Node<T> {
     }
 
     public Optional<Route<T>> getRoute() {
-        return Optional.of(route);
+        return Optional.ofNullable(route);
     }
 
     public void setRoute(Route<T> route) {

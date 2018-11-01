@@ -46,7 +46,7 @@ public class Routes<T> {
 
         matchingNodes0.add(root);
 
-        SortedSet<Route<T>> results = new TreeSet<>((tRoute, t1) -> t1.getPriority() - tRoute.getPriority());
+        SortedSet<Route<T>> results = new TreeSet<>(Comparator.comparingInt(Route::getPriority));
 
         for (Path.Segment seg: thePath.getSegments()) {
             while (! matchingNodes0.isEmpty()) {
