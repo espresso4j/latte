@@ -1,7 +1,7 @@
 package io.github.espresso4j.latte;
 
 import io.github.espresso4j.espresso.Espresso;
-import io.github.espresso4j.espresso.Request;
+import io.github.espresso4j.espresso.ExtensionHolder;
 import io.github.espresso4j.espresso.Response;
 import io.github.espresso4j.latte.internal.Route;
 import io.github.espresso4j.latte.internal.Routes;
@@ -11,6 +11,19 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Url route for Espresso based application.
+ *
+ * Url pattern is also supported:
+ *
+ * * `:var` will match a single segment of url, and resolved to `var`
+ * * `*var will match any segments of url, and resolved to `var
+ *
+ * Resolved url variable will be stored in extension of Request. Latte provides a static helper function `extension`
+ * to get the variable-value map.
+ *
+ * @param <T> Espresso or Espresso.Async
+ */
 public class Latte<T> {
 
     private Routes<T> routes = new Routes<>();
@@ -26,18 +39,20 @@ public class Latte<T> {
     }
 
     /**
+     * Create a Latte instance for Espresso or Espresso.Async
      *
-     * @return
+     * @return a latte instance
      */
     public static <T> Latte<T> by(Class<T> type) {
         return new Latte<>(type);
     }
 
     /**
+     * Bind a url pattern for a particular Espresso or Espresso.Async handler
      *
-     * @param pathSpec
-     * @param handler
-     * @return
+     * @param pathSpec the path spec
+     * @param handler the handler to run when path spec matched
+     * @return self
      */
     public Latte<T> on(@Nonnull String pathSpec, @Nonnull T handler) {
         this.routes.addRoute(new Route<>(pathSpec, handler, this.priority++));
@@ -46,8 +61,8 @@ public class Latte<T> {
 
     /**
      * handler to invoke when url not found
-     * @param handler
-     * @return
+     * @param handler the handler when no path spec matched
+     * @return self
      */
     public Latte<T> notFound(@Nonnull T handler) {
         this.notFound = handler;
@@ -56,7 +71,7 @@ public class Latte<T> {
 
     /**
      * Create latte handler
-     * @return
+     * @return an espresso handler contains current routes
      */
     public Espresso intoEspresso() {
         if (this.type == Espresso.class) {
@@ -85,8 +100,8 @@ public class Latte<T> {
     }
 
     /**
-     * Create latte handler
-     * @return
+     * Create latte async handler
+     * @return an espresso async handler contains for current routes
      */
     public Espresso.Async intoEspressoAsync() {
         if (this.type == Espresso.Async.class) {
@@ -115,9 +130,15 @@ public class Latte<T> {
         }
     }
 
+    /**
+     * A helper function to access latte variables in request
+     *
+     * @param ext the request instance
+     * @return the latte variable map
+     */
     @SuppressWarnings("unchecked")
-    public static Map<String, String> extension(Request request) {
-        Object value = request.extensions().get(Latte.class);
+    public static Map<String, String> extension(ExtensionHolder ext) {
+        Object value = ext.extension(Latte.class);
         if (value != null) {
             return (Map<String, String>) value;
         } else {
