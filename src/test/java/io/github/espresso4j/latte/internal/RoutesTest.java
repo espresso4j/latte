@@ -50,7 +50,8 @@ public class RoutesTest {
         intRoutes.addRoute(new Route<>("/minus", 3, 3));
         intRoutes.addRoute(new Route<>("/minus/1", 4, 4));
         intRoutes.addRoute(new Route<>("/minus/:value", 5, 5));
-        intRoutes.addRoute(new Route<>("/minus/*foo", 6, 6));
+        intRoutes.addRoute(new Route<>("/minus/:foo/abc", 6, 6));
+        intRoutes.addRoute(new Route<>("/minus/*foo", 7, 7));
 
         assertEquals(1, intRoutes.matchRoute("/").get().getPayload().intValue());
         assertEquals(2, intRoutes.matchRoute("/plus").get().getPayload().intValue());
@@ -58,7 +59,8 @@ public class RoutesTest {
         assertEquals(3, intRoutes.matchRoute("/minus").get().getPayload().intValue());
         assertEquals(4, intRoutes.matchRoute("/minus/1").get().getPayload().intValue());
         assertEquals(5, intRoutes.matchRoute("/minus/2").get().getPayload().intValue());
-        assertEquals(6, intRoutes.matchRoute("/minus/2/3").get().getPayload().intValue());
+        assertEquals(6, intRoutes.matchRoute("/minus/2/abc").get().getPayload().intValue());
+        assertEquals(7, intRoutes.matchRoute("/minus/2/3").get().getPayload().intValue());
 
         assertEquals(3, intRoutes.matchRoutes("/minus/1").size());
         assertEquals(0, intRoutes.matchRoutes("/multi/1").size());
