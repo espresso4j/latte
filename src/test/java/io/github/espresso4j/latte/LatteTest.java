@@ -12,6 +12,7 @@ public class LatteTest {
 
     private static Request requestOnUri(String uri) {
         Request request = new Request();
+        request.setRequestMethod(Request.Method.GET);
         request.setUri(uri);
 
         return request;
@@ -70,6 +71,17 @@ public class LatteTest {
         assertEquals("0", latte.call(requestOnUri("/")).body().get());
         assertEquals("123", latte.call(requestOnUri("/sub/123")).body().get());
         assertEquals("123/456", latte.call(requestOnUri("/sub/123/456")).body().get());
+    }
+
+    @Test
+    public void testMethodMatching() {
+        Espresso latte = Latte.by(Espresso.class)
+                .on(Request.Method.POST, "/foo", (req) -> Response.of(200).body("POST"))
+                .on(Request.Method.GET, "/foo", (req) -> Response.of(200).body("GET"))
+                .on(Request.Method.DELETE, "/foo", (req) -> Response.of(200).body("DELETE"))
+                .intoEspresso();
+
+        assertEquals("GET", latte.call(requestOnUri("/foo")).body().get());
     }
 
 }

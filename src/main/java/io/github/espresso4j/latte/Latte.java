@@ -2,6 +2,7 @@ package io.github.espresso4j.latte;
 
 import io.github.espresso4j.espresso.Espresso;
 import io.github.espresso4j.espresso.ExtensionHolder;
+import io.github.espresso4j.espresso.Request;
 import io.github.espresso4j.espresso.Response;
 import io.github.espresso4j.latte.internal.Route;
 import io.github.espresso4j.latte.internal.Routes;
@@ -48,6 +49,18 @@ public class Latte<T> {
     }
 
     /**
+     * Bind a url pattern for a HTTP method request particular Espresso or Espresso.Async handler
+     *
+     * @param pathSpec the path spec
+     * @param handler the handler to run when path spec matched
+     * @return self
+     */
+    public Latte<T> on(@Nonnull Request.Method method, @Nonnull String pathSpec, @Nonnull T handler) {
+        this.routes.addRoute(new Route<>(method.name(), pathSpec, handler, this.priority++));
+        return this;
+    }
+
+    /**
      * Bind a url pattern for a particular Espresso or Espresso.Async handler
      *
      * @param pathSpec the path spec
@@ -55,7 +68,7 @@ public class Latte<T> {
      * @return self
      */
     public Latte<T> on(@Nonnull String pathSpec, @Nonnull T handler) {
-        this.routes.addRoute(new Route<>(pathSpec, handler, this.priority++));
+        this.routes.addRoute(new Route<>(Route.ANY_METHOD, pathSpec, handler, this.priority++));
         return this;
     }
 
@@ -79,7 +92,8 @@ public class Latte<T> {
 
             return request -> {
                 String requestUri = request.getUri();
-                Optional<Route<T>> handler = Latte.this.routes.matchRoute(requestUri);
+                String method = request.getRequestMethod().name();
+                Optional<Route<T>> handler = Latte.this.routes.matchRoute(method, requestUri);
 
                 if (handler.isPresent()) {
                     // matched
@@ -110,7 +124,9 @@ public class Latte<T> {
 
             return (request, send, raise) -> {
                 String requestUri = request.getUri();
-                Optional<Route<T>> handler = Latte.this.routes.matchRoute(requestUri);
+                String method = request.getRequestMethod().name();
+
+                Optional<Route<T>> handler = Latte.this.routes.matchRoute(method, requestUri);
 
                 if (handler.isPresent()) {
                     // matched

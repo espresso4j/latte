@@ -21,6 +21,9 @@ Latte breaks URL into slash `/` separated segments.
 * `:foo` matches a single segment in url path
 * `*foo` matches rest of url segments
 
+If you don't specify request method, it will match any incoming request
+for this path.
+
 ```java
 import io.github.espresso4j.espresso.*;
 import io.github.espresso4j.latte.*;
@@ -35,7 +38,7 @@ var notFound = req -> Response.of(404);
 
 var app = Latte.by(Espresso.class)
     .on("/", index)
-    .on("/fetch/:id", fetch)
+    .on(Request.Method.GET, "/fetch/:id", fetch)
     .notFound(notFound)
     .intoEspresso();
 

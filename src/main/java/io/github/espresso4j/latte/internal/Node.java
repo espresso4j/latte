@@ -1,12 +1,14 @@
 package io.github.espresso4j.latte.internal;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Node<T> {
 
     private TreeMap<String, Node<T>> children = new TreeMap<>();
 
-    private Route<T> route;
+    private Map<String, Route<T>> methodToRoutes = new HashMap<>(7);
 
     private String name;
 
@@ -26,15 +28,18 @@ public class Node<T> {
         return children;
     }
 
-    public Optional<Route<T>> getRoute() {
-        return Optional.ofNullable(route);
-    }
-
-    public void setRoute(Route<T> route) {
-        this.route = route;
+    public Map<String, Route<T>> getMethodToRoutes() {
+        return methodToRoutes;
     }
 
     public String getName() {
         return name;
+    }
+
+    public Stream<Route<T>> getRoutes(String method) {
+        Route<T> wildMethodRoute = methodToRoutes.get(Route.ANY_METHOD);
+        Route<T> methodRoute = methodToRoutes.get(method);
+
+        return Stream.of(wildMethodRoute, methodRoute).filter(Objects::nonNull);
     }
 }

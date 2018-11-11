@@ -31,7 +31,7 @@ public class Routes<T> {
             }
         }
 
-        currentNode.setRoute(route);
+        currentNode.getMethodToRoutes().putIfAbsent(route.getMethod(), route);
     }
 
     /**
@@ -39,7 +39,7 @@ public class Routes<T> {
      * @param path
      * @return
      */
-    public SortedSet<Route<T>> matchRoutes(String path) {
+    public SortedSet<Route<T>> matchRoutes(String method, String path) {
         Path thePath = Path.from(path);
         Deque<Node<T>> matchingNodes0 = new ArrayDeque<>();
         Deque<Node<T>> matchingNodes1 = new ArrayDeque<>();
@@ -64,7 +64,7 @@ public class Routes<T> {
 
                 // catchAll
                 Collection<Node<T>> catchAllChildren = matchingParent.getCatchAllChildren();
-                catchAllChildren.forEach((n) -> n.getRoute().ifPresent(results::add));
+                catchAllChildren.forEach((n) -> n.getRoutes(method).forEach(results::add));
             }
 
             Deque<Node<T>> swap = matchingNodes0;
@@ -72,7 +72,7 @@ public class Routes<T> {
             matchingNodes1 = swap;
         }
 
-        matchingNodes0.forEach((n) -> n.getRoute().ifPresent(results::add));
+        matchingNodes0.forEach((n) -> n.getRoutes(method).forEach(results::add));
 
         return results;
     }
@@ -82,8 +82,9 @@ public class Routes<T> {
      * @param path
      * @return
      */
-    public Optional<Route<T>> matchRoute(String path) {
-        SortedSet<Route<T>> results = matchRoutes(path);
+    public Optional<Route<T>> matchRoute(String method, String path) {
+        SortedSet<Route<T>> results = matchRoutes(method, path);
+
         if (results.isEmpty()) {
             return Optional.empty();
         } else {
