@@ -19,7 +19,7 @@ public class LatteTest {
     }
 
     @Test
-    public void testLatte() {
+    public void testLatte() throws Exception {
         Espresso latte = Latte.by(Espresso.class)
                 .on("/", (req) -> Response.of(200).body("root"))
                 .on("/sub", (req) -> Response.of(200).body("/sub"))
@@ -61,7 +61,7 @@ public class LatteTest {
     }
 
     @Test
-    public void testPathSpecCatching() {
+    public void testPathSpecCatching()  throws Exception {
         Espresso latte = Latte.by(Espresso.class)
                 .on("/", (req) -> Response.of(200).body(String.valueOf(Latte.extension(req).size())))
                 .on("/sub/:foo", (req) -> Response.of(200).body(Latte.extension(req).get("foo")))
@@ -74,7 +74,7 @@ public class LatteTest {
     }
 
     @Test
-    public void testMethodMatching() {
+    public void testMethodMatching() throws Exception {
         Espresso latte = Latte.by(Espresso.class)
                 .on(Request.Method.POST, "/foo", (req) -> Response.of(200).body("POST"))
                 .on(Request.Method.GET, "/foo", (req) -> Response.of(200).body("GET"))
