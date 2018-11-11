@@ -42,7 +42,7 @@
     <dependency>
       <groupId>io.github.espresso4j</groupId>
       <artifactId>espresso</artifactId>
-      <version>0.3.2</version>
+      <version>0.3.1</version>
     </dependency>
 
     <dependency>
